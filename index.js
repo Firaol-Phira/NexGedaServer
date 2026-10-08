@@ -17,7 +17,10 @@ dotenv.config({ path: envFile });
 const app = express();
 const PORT = process.env.PORT || 2123;
 const JWT_SECRET = process.env.JWT_SECRET;
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+const BASE_URL = (process.env.BASE_URL || `http://localhost:${PORT}`).replace(
+  /\/$/,
+  "",
+);
 // ==============================
 // MIDDLEWARE
 // ==============================
