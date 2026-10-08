@@ -1,4 +1,3 @@
-import "dotenv/config";
 import express from "express";
 import mysql from "mysql2/promise";
 import bcrypt from "bcrypt";
@@ -8,6 +7,12 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 
+import dotenv from "dotenv";
+
+const envFile =
+  process.env.NODE_ENV === "production" ? ".env.production" : ".env.local";
+
+dotenv.config({ path: envFile });
 
 const app = express();
 const PORT = process.env.PORT || 2123;
@@ -50,15 +55,16 @@ const upload = multer({ storage });
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
+  port: process.env.DB_PORT,
   user: process.env.DB_USER,
-  password: process.env.DB_PASS,
+  password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  ssl: {
-    ca: process.env.DB_CA?.replace(/\\n/g, "\n"),
-  },
-  waitForConnections: true,
-  connectionLimit: 5,
+  ssl:
+    process.env.DB_SSL === "true"
+      ? process.env.DB_CA
+        ? { ca: process.env.DB_CA.replace(/\\n/g, "\n") }
+        : { rejectUnauthorized: false }
+      : undefined,
 });
 
 // ==============================
