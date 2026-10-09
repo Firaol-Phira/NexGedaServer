@@ -529,9 +529,9 @@ app.get("/api/founder", async (req, res) => {
 
     const founder = founders[0];
 
-    if (founder.avatar) {
-      founder.avatar = `${BASE_URL}/${founder.avatar}`;
-    }
+ if (founder.avatar && !founder.avatar.startsWith("http")) {
+   founder.avatar = `${BASE_URL}/${founder.avatar}`;
+ }
 
     res.json(founder);
   } catch (error) {
