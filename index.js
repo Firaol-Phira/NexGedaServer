@@ -867,7 +867,38 @@ app.put("/api/user/course", async (req, res) => {
     });
   }
 });
+// ==============================
+// UPDATE AVATAR (CLOUDINARY URL)
+// ==============================
 
+app.post("/api/user/update-avatar-url", async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Unauthorized." });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const { avatar } = req.body;
+
+    if (!avatar || !avatar.startsWith("https://res.cloudinary.com/")) {
+      return res.status(400).json({ message: "Invalid avatar URL" });
+    }
+
+    await pool.query("UPDATE users SET avatar = ? WHERE id = ?", [
+      avatar,
+      decoded.id,
+    ]);
+
+    res.json({ message: "Avatar updated successfully", avatar });
+  } catch (error) {
+    console.error("Avatar URL error:", error);
+    res.status(500).json({ message: "Failed to update avatar" });
+  }
+});
 // ==============================
 // START SERVER
 // ==============================
